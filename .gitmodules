@@ -49,6 +49,9 @@
 [submodule "bootstrapify"]
 	path = bootstrapify
 	url = https://github.com/ingwinlu/pelican-bootstrapify.git
+[submodule "sort_tags"]
+	path = sort_tags
+	url = https://github.com/ingwinlu/sort_tags.git
 [submodule "pelican-jinja2content"]
 	path = pelican-jinja2content
 	url = https://github.com/joachimneu/pelican-jinja2content.git
