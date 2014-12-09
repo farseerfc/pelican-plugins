@@ -72,9 +72,8 @@ class YouTube(Directive):
             align = self.options['align']
 
         url = 'https://www.youtube.com/embed/{}'.format(videoID)
-        div_block = '<div class="youtube" align="{}">'.format(align)
-        embed_block = '<iframe width="{}" height="{}" src="{}" '\
-                      'frameborder="0"></iframe>'.format(width, height, url)
+        div_block = '<div class="youtube embed-responsive embed-responsive-16by9" align="{}">'.format(align)
+        embed_block = '<iframe src="{}" frameborder="0"></iframe>'.format(url)
 
         return [
             nodes.raw('', div_block, format='html'),

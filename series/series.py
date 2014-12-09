@@ -70,6 +70,28 @@ def aggregate_series(generator):
             except IndexError:
                 article.series['next'] = None
 
+            for tran in article.translations:
+                lang = tran.lang
+                tran.series = dict()
+                article.series['index'] = index + 1
+                all_trans = [t
+                             for a in ordered_articles
+                             for t in a.translations
+                             if t.lang == tran.lang]
+                tran.series['all'] = all_trans
+                tran.series['all_previous'] = all_trans[0: index]
+                tran.series['all_next'] = all_trans[index + 1:]
+
+                if index > 0:
+                    tran.series['previous'] = all_trans[index - 1]
+                else:
+                    tran.series['previous'] = None
+
+                try:
+                    tran.series['next'] = all_trans[index + 1]
+                except IndexError:
+                    tran.series['next'] = None
+
 
 def register():
     signals.article_generator_finalized.connect(aggregate_series)

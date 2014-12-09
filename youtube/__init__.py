@@ -18,7 +18,7 @@
 # SOFTWARE.
 
 # -*- coding: utf-8 -*-
-__title__ = 'pelican-youtube'
+__title__ = 'youtube'
 __version__ = '0.1.0'
 __author__ = 'Kura'
 __credits__ = ["Kura", ]
@@ -28,4 +28,4 @@ __status__ = "Stable"
 __license__ = 'MIT'
 __copyright__ = 'Copyright 2013'
 
-from pelican_youtube.youtube import register
+from .youtube import register
