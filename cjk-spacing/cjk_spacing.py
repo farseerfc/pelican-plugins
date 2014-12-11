@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from pelican import signals, contents
 
 cjk_range = [
@@ -9,13 +11,14 @@ cjk_range = [
     (u'\uFA70', u'\uFAD9'),  # CJK Compatibility Ideographs
     (u'\U00020000', u'\U0002A6D6'),  # CJK Unified Ideographs Extension B
     (u'\U0002F800', u'\U0002FA1D'),  # CJK Compatibility Supplement
-    ]
+]
 
 punc_range = [
-    (u'\u0000', u'\u0020'),  # space
-    (u'\u3000', u'\u303f'),  # CJK Symbols and Punctuation
+    (u'\u3000', u'\u309f'),
+    (u'\u30a0', u'\u30ff'),
+    (u'\u31f0', u'\u31ff'),
     (u'\uff00', u'\uffef'),  # Halfwidth and Fullwidth Forms
-    ]
+]
 
 
 def _with_range(char, check_range):
@@ -26,40 +29,34 @@ def _with_range(char, check_range):
 
 
 def is_cjk(char):
-    return _with_range(char, cjk_range)
+    return _with_range(char, cjk_range) or _with_range(char, punc_range)
 
 
-def is_punc(char):
-    return _with_range(char, punc_range)
+def is_space(char):
+    return char in "\r\t\n "
 
 
 def chinese_auto_spacing(content):
     if content._content is None:
         return
 
-    ret = u''
+    ret = []
     src = content._content
-    prev = None
+    cjk_mode = False
     for char in src:
-        sp = u''
-        curr_is_cjk = is_cjk(char)
-        curr_is_punc = is_punc(char)
+        if cjk_mode:
+            if is_space(char):
+                continue
+            if not is_cjk(char):
+                ret.append(" ")
+        else:
+            if is_cjk(char):
+                ret.append(" ")
 
-        if prev:
-            prev_is_cjk, prev_is_punc = prev
-
-            if curr_is_punc or prev_is_punc:
-                # do not add space to punctuation
-                sp = u''
-
-            elif prev_is_cjk != curr_is_cjk:
-                sp = u' '
-
-        ret = ret + sp + char
-        prev = (curr_is_cjk, curr_is_punc)
-
-    if ret:
-        content._content = ret
+        cjk_mode = is_cjk(char)
+        ret.append(char)
+    if len(ret) > 0:
+        content._content = "".join(ret)
 
 
 def register():
