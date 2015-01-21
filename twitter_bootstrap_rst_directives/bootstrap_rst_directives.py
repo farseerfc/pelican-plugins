@@ -11,6 +11,9 @@ the twitter bootstrap framework.
 
 """
 
+from __future__ import unicode_literals
+
+
 from uuid import uuid1
 
 from cgi import escape
