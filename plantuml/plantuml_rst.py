@@ -50,9 +50,9 @@ class PlantUML(Directive):
 
         body = '\n'.join(self.content)
         tf = tempfile.NamedTemporaryFile(delete=True)
-        tf.write('@startuml\n')
+        tf.write('@startuml\n'.encode('utf-8'))
         tf.write(body.encode('utf8'))
-        tf.write('\n@enduml')
+        tf.write('\n@enduml'.encode('utf-8'))
         tf.flush()
 
         imgformat = self.options.get('format', 'png')
