@@ -40,8 +40,7 @@ class PlantUML(Directive):
         source_dir = os.path.dirname(os.path.abspath(source))
         source_dir = utils.relative_path(None, source_dir)
 
-        path = os.path.abspath(os.path.join('content', 'images'))
-        logger.debug("plantuml: output dir %s" % path)
+        path = os.path.abspath(os.path.join('content', 'uml'))
 
         if not os.path.exists(path):
             os.makedirs(path)
@@ -95,7 +94,7 @@ class PlantUML(Directive):
                     logger.debug('File '+newname+' does not exist, not deleted')
 
                 os.rename(name, newname)
-                url = global_siteurl + '/images/' + os.path.basename(newname)
+                url = global_siteurl + '/uml/' + os.path.basename(newname)
                 imgnode = image(uri=url, classes=classes, alt=alt)
                 nodes.append(imgnode)
             else:

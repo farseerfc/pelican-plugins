@@ -59,6 +59,16 @@ class CleanHTMLTranslator(PelicanHTMLTranslator):
     def visit_container(self, node):
         self.body.append(self.starttag(node, 'div'))
 
+    # def visit_raw(self, node):
+    #     classes = node.get('classes', node.get('class', []))
+    #     if 'ruby' in classes:
+    #         self.body.append(self.starttag(node.rawtext, 'ruby'))
+
+    # def depart_raw(self, node):
+    #     classes = node.get('classes', node.get('class', []))
+    #     if 'ruby' in classes:
+    #         self.body.append('</ruby>\n')
+
 
 class CleanRSTReader(RstReader):
 
@@ -126,6 +136,37 @@ def code_role(name, rawtext, text, lineno, inliner,
 
     return [new_element], []
 
+
+def ruby_role(name, rawtext, text, lineno, inliner,
+              options={}, content=[]):
+    """
+        This function creates an inline code block as defined in the twitter bootstrap documentation
+        overrides the default behaviour of the code role
+
+        *usage:*
+            :ruby:`text|title`
+
+    """
+    content = "<ruby><rb>%s</rb><rp>(</rp><rt>%s</rt><rp>)</rp></ruby>" % (
+        tuple(text.split("|")))
+    new_element = nodes.raw(rawtext, utils.unescape(content, 1), format="html")
+    new_element.source, new_element.line = inliner.reporter.get_source_and_line(lineno)
+    return [new_element], []
+
+
+def html_role(name, rawtext, text, lineno, inliner,
+              options={}, content=[]):
+    """
+        This function creates an inline code block as defined in the twitter bootstrap documentation
+        overrides the default behaviour of the code role
+
+        *usage:*
+            :ruby:`text|title`
+
+    """
+    new_element = nodes.raw(rawtext, utils.unescape(text, 1), format="html")
+    new_element.source, new_element.line = inliner.reporter.get_source_and_line(lineno)
+    return [new_element], []
 
 def glyph_role(name, rawtext, text, lineno, inliner,
                options={}, content=[]):
@@ -534,6 +575,8 @@ def register_roles():
     rst.roles.register_local_role('glyph', glyph_role)
     rst.roles.register_local_role('code', code_role)
     rst.roles.register_local_role('kbd', keyboard_role)
+    rst.roles.register_local_role('ruby', ruby_role)
+    rst.roles.register_local_role('html', html_role)
 
 
 def add_reader(readers):
