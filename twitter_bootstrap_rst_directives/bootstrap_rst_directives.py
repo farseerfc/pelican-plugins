@@ -147,8 +147,11 @@ def ruby_role(name, rawtext, text, lineno, inliner,
             :ruby:`text|title`
 
     """
-    content = "<ruby><rb>%s</rb><rp>(</rp><rt>%s</rt><rp>)</rp></ruby>" % (
-        tuple(text.split("|")))
+    rs = tuple(text.split("|"))
+    if len(rs) == 2:
+        content = "<ruby><rb>%s</rb><rp>(</rp><rt>%s</rt><rp>)</rp></ruby>" % rs
+    else:
+        content = "<ruby><rb>%s</rb><rp>(</rp><rt> Error no ruby </rt><rp>)</rp></ruby>" % text
     new_element = nodes.raw(rawtext, utils.unescape(content, 1), format="html")
     new_element.source, new_element.line = inliner.reporter.get_source_and_line(lineno)
     return [new_element], []

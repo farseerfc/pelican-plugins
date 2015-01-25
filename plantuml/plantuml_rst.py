@@ -110,6 +110,8 @@ class PlantUML(Directive):
 def custom_url(generator, metadata):
     global global_siteurl
     global_siteurl = generator.settings['SITEURL']
+    if "/" in global_siteurl[2:]:  # trim "//" from url, and return to origin SITEURL for subsites
+        global_siteurl = global_siteurl[:global_siteurl.rindex("/")]
 
 
 def register():
