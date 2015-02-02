@@ -156,6 +156,31 @@ def ruby_role(name, rawtext, text, lineno, inliner,
     new_element.source, new_element.line = inliner.reporter.get_source_and_line(lineno)
     return [new_element], []
 
+def twi_role(name, rawtext, text, lineno, inliner,
+              options={}, content=[]):
+    """
+        This function creates an inline code block as defined in the twitter bootstrap documentation
+        overrides the default behaviour of the code role
+
+        *usage:*
+            :twi:`userid`
+
+    """
+    new_element = nodes.reference(rawtext, "@"+text, refuri="//twitter.com/"+text)
+    return [new_element], []
+
+def irc_role(name, rawtext, text, lineno, inliner,
+              options={}, content=[]):
+    """
+        This function creates an inline code block as defined in the twitter bootstrap documentation
+        overrides the default behaviour of the code role
+
+        *usage:*
+            :twi:`userid`
+
+    """
+    new_element = nodes.reference(rawtext, "#"+text, refuri="//webchat.freenode.net/?channels="+text)
+    return [new_element], []
 
 def html_role(name, rawtext, text, lineno, inliner,
               options={}, content=[]):
@@ -580,6 +605,8 @@ def register_roles():
     rst.roles.register_local_role('kbd', keyboard_role)
     rst.roles.register_local_role('ruby', ruby_role)
     rst.roles.register_local_role('html', html_role)
+    rst.roles.register_local_role('twi', twi_role)
+    rst.roles.register_local_role('irc', irc_role)
 
 
 def add_reader(readers):
