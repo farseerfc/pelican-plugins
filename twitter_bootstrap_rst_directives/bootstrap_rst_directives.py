@@ -169,6 +169,7 @@ def twi_role(name, rawtext, text, lineno, inliner,
     new_element = nodes.reference(rawtext, "@"+text, refuri="//twitter.com/"+text)
     return [new_element], []
 
+
 def irc_role(name, rawtext, text, lineno, inliner,
               options={}, content=[]):
     """
@@ -182,6 +183,27 @@ def irc_role(name, rawtext, text, lineno, inliner,
     new_element = nodes.reference(rawtext, "#"+text, refuri="//webchat.freenode.net/?channels="+text)
     return [new_element], []
 
+
+def del_role(name, rawtext, text, lineno, inliner,
+              options={}, content=[]):
+    """
+        This function creates an inline code block as defined in the twitter bootstrap documentation
+        overrides the default behaviour of the code role
+
+        *usage:*
+            :html:`raw html`
+
+    """
+    if "|" in text:
+        i = text.index("|")
+        content = "<del>%s</del><ins>%s</ins>" % (text[:i], text[i + 1:])
+    else:
+        content = "<del>%s</del>" % text
+    new_element = nodes.raw(rawtext, utils.unescape(content, 1), format="html")
+    new_element.source, new_element.line = inliner.reporter.get_source_and_line(lineno)
+    return [new_element], []
+
+
 def html_role(name, rawtext, text, lineno, inliner,
               options={}, content=[]):
     """
@@ -189,7 +211,7 @@ def html_role(name, rawtext, text, lineno, inliner,
         overrides the default behaviour of the code role
 
         *usage:*
-            :ruby:`text|title`
+            :html:`raw html`
 
     """
     new_element = nodes.raw(rawtext, utils.unescape(text, 1), format="html")
@@ -604,6 +626,7 @@ def register_roles():
     rst.roles.register_local_role('code', code_role)
     rst.roles.register_local_role('kbd', keyboard_role)
     rst.roles.register_local_role('ruby', ruby_role)
+    rst.roles.register_local_role('del', del_role)
     rst.roles.register_local_role('html', html_role)
     rst.roles.register_local_role('twi', twi_role)
     rst.roles.register_local_role('irc', irc_role)
