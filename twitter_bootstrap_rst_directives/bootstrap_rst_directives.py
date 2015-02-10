@@ -487,6 +487,62 @@ class DangerAlert(Alert):
     custom_class = 'danger'
 
 
+class Friend(rst.Directive):
+    has_content = True
+    required_arguments = 0
+    option_spec = {
+        'gravatar': rst.directives.unchanged,
+        'logo': rst.directives.unchanged,
+        'nick': rst.directives.unchanged_required,
+    }
+
+    def run(self):
+        from hashlib import md5
+        # now we get the content
+        text = '\n'.join(self.content)
+
+        # get container element
+        container_element = nodes.container()
+        container_element['classes'] += ['media']
+
+        # get image element
+        logo_url = ''
+        if 'logo' in self.options:
+            logo_url = self.options['logo']
+        if 'gravatar' in self.options:
+            gravatar_email = self.options['gravatar'].strip().encode('utf-8')
+            logo_url = 'https://www.gravatar.com/avatar/' + md5(gravatar_email).hexdigest()
+
+        image_element = nodes.image(logo_url, alt=self.options['nick'], width="80px", **self.options)
+        image_element['uri'] = logo_url
+        image_element["classes"] += ['media-object']
+
+        image_container = nodes.container()
+        image_container["classes"] += ['media-left']
+        image_container.append(image_element)
+
+        title_text = self.options['nick']
+        heading_element = nodes.container(title_text)
+        title_nodes, messages = self.state.inline_text(title_text,
+                                                       self.lineno)
+        title = nodes.paragraph(title_text, '', *title_nodes)
+
+        heading_element.append(title)
+        heading_element['classes'] += ['media-heading']
+
+        # get body element
+        body_container = nodes.container()
+        body_element = nodes.container(text)
+        self.state.nested_parse(self.content, self.content_offset,
+                                body_element)
+        body_container.append(heading_element)
+        body_container.append(body_element)
+        body_container['classes'] += ['media-body']
+
+        container_element.append(image_container)
+        container_element.append(body_container)
+        return [container_element, ]
+
 class Media(rst.Directive):
 
     '''
@@ -618,7 +674,8 @@ def register_directives():
     rst.directives.register_directive('alert-warning', WarningAlert)
     rst.directives.register_directive('alert-danger', DangerAlert)
 
-    rst.directives.register_directive( 'media', Media )
+    rst.directives.register_directive('media', Media)
+    rst.directives.register_directive('friend', Friend)
 
 
 def register_roles():
