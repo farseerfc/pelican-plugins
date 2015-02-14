@@ -170,6 +170,17 @@ def twi_role(name, rawtext, text, lineno, inliner,
     return [new_element], []
 
 
+def fref_role(name, rawtext, text, lineno, inliner,
+              options={}, content=[]):
+    """
+        *usage:*
+            :fref:`userid`
+
+    """
+    new_element = nodes.reference(rawtext, text, refuri="/links.html#" + (text.lower()))
+    return [new_element], []
+
+
 def irc_role(name, rawtext, text, lineno, inliner,
               options={}, content=[]):
     """
@@ -489,7 +500,7 @@ class DangerAlert(Alert):
 
 class Friend(rst.Directive):
     has_content = True
-    required_arguments = 0
+    required_arguments = 1
     option_spec = {
         'gravatar': rst.directives.unchanged,
         'logo': rst.directives.unchanged,
@@ -504,6 +515,7 @@ class Friend(rst.Directive):
         # get container element
         container_element = nodes.container()
         container_element['classes'] += ['media']
+        container_element["ids"] += [self.arguments[0].lower()]
 
         # get image element
         logo_url = ''
@@ -686,6 +698,7 @@ def register_roles():
     rst.roles.register_local_role('del', del_role)
     rst.roles.register_local_role('html', html_role)
     rst.roles.register_local_role('twi', twi_role)
+    rst.roles.register_local_role('fref', fref_role)
     rst.roles.register_local_role('irc', irc_role)
 
 
