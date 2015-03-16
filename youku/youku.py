@@ -120,23 +120,25 @@ class YouTubeKu(Directive):
         ku_embed_block = '<embed src="http://player.youku.com/player.php/sid/{}/v.swf" allowFullScreen="true" quality="high" align="middle" allowScriptAccess="always" type="application/x-shockwave-flash"></embed>'.format(kuVideoID)
 
         tab_block = """
-        <ul class="nav nav-pills">
-            <li class="active"><a href="#youtube_%s" data-toggle="tab">Youtube</a></li>
-            <li><a href="#youku_%s" data-toggle="tab">Youku</a></li>
-        </ul>
-        <div id="youtubeku" class="tab-content">
-            <div class="tab-pane fade active in" id="youtube_%s">
-                %s %s %s
+        <div class="well" style="padding: 0">
+            <div id="youtubeku" class="tab-content">
+                <div class="tab-pane fade active in" id="youtube_%s">
+                    %s %s %s
+                </div>
+                <div class="tab-pane fade" id="youku_%s">
+                    %s %s %s
+                </div>
             </div>
-            <div class="tab-pane fade" id="youku_%s">
-                %s %s %s
-            </div>
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="#youtube_%s" data-toggle="tab">Youtube</a></li>
+                <li><a href="#youku_%s" data-toggle="tab">Youku</a></li>
+            </ul>
         </div>
-        """ % (tubeVideoID, kuVideoID,
-               tubeVideoID,
+        """ % (tubeVideoID,
                tube_div_block, tube_embed_block, '</div>',
                kuVideoID,
-               ku_div_block, ku_embed_block, '</div>')
+               ku_div_block, ku_embed_block, '</div>',
+               tubeVideoID, kuVideoID)
 
         return [nodes.raw('', tab_block, format='html')]
 
