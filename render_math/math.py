@@ -56,7 +56,7 @@ def process_settings(pelicanobj):
     # will be used for
 
     # Default settings
-    mathjax_settings['auto_insert'] = True  # if set to true, it will insert mathjax script automatically into content without needing to alter the template. 
+    mathjax_settings['auto_insert'] = True  # if set to true, it will insert mathjax script automatically into content without needing to alter the template.
     mathjax_settings['align'] = 'center'  # controls alignment of of displayed equations (values can be: left, right, center)
     mathjax_settings['indent'] = '0em'  # if above is not set to 'center', then this setting acts as an indent
     mathjax_settings['show_menu'] = 'true'  # controls whether to attach mathjax contextual menu
@@ -71,8 +71,9 @@ def process_settings(pelicanobj):
     mathjax_settings['process_summary'] = BeautifulSoup is not None  # will fix up summaries if math is cut off. Requires beautiful soup
     mathjax_settings['force_tls'] = 'false'  # will force mathjax to be served by https - if set as False, it will only use https if site is served using https
 
-    # Source for MathJax
-    mathjax_settings['source'] = "'//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'"
+    # Source for MathJax: Works boths for http and https (see http://docs.mathjax.org/en/latest/start.html#secure-access-to-the-cdn)
+    #mathjax_settings['source'] = "'//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'"
+    mathjax_settings['source'] = "'//cdnjscn.b0.upaiyun.com/libs/mathjax/2.4.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML'"
 
     # Get the user specified settings
     try:
@@ -151,7 +152,7 @@ def process_settings(pelicanobj):
             mathjax_settings[key] = 'true' if value else 'false'
 
         if key == 'force_tls' and isinstance(value, bool):
-            mathjax_settings[key] = 'true' if value else 'false'       
+            mathjax_settings[key] = 'true' if value else 'false'
 
         if key == 'responsive_break' and isinstance(value, int):
             mathjax_settings[key] = str(value)
@@ -244,7 +245,7 @@ def process_mathjax_script(mathjax_settings):
     """Load the mathjax script template from file, and render with the settings"""
 
     # Read the mathjax javascript template from file
-    with open (os.path.dirname(os.path.realpath(__file__)) 
+    with open (os.path.dirname(os.path.realpath(__file__))
             + '/mathjax_script_template', 'r') as mathjax_script_template:
         mathjax_template = mathjax_script_template.read()
 
