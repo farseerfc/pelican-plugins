@@ -527,7 +527,7 @@ class Friend(rst.Directive):
 
         image_element = nodes.image(logo_url, alt=self.options['nick'], width="80px", **self.options)
         image_element['uri'] = logo_url
-        image_element["classes"] += ['media-object']
+        image_element["classes"] = ['media-object']
 
         image_container = nodes.container()
         image_container["classes"] += ['media-left']
