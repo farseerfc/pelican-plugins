@@ -147,7 +147,7 @@ class Ditaa(Directive):
 
         alt = self.options.get('alt', 'ditaa diagram')
         classes = self.options.pop('class', ['ditaa'])
-        cmdline = ['ditaa', '-v', tf.name, output_path]
+        cmdline = ['ditaa', '-v', '-o', tf.name, output_path]
 
         try:
             p = Popen(cmdline, stdout=PIPE, stderr=PIPE)
