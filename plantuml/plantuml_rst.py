@@ -7,22 +7,25 @@
 """
 
 from __future__ import unicode_literals
-
+import sys
 import os
 import tempfile
+
+from subprocess import Popen,PIPE
 from zlib import adler32
-from subprocess import Popen, PIPE
 
 from docutils.nodes import image, literal_block
 from docutils.parsers.rst import Directive, directives
-from docutils import utils
+from pelican import signals, logger
 
-from pelican import logger, signals
-
-global_siteurl = ""
+from .generateUmlDiagram import generate_uml_image
 
 
-class PlantUML(Directive):
+global_siteurl = "" # URL of the site, filled on plugin initialization
+
+
+class PlantUML_rst(Directive):
+    """ reST directive for PlantUML """
     required_arguments = 0
     optional_arguments = 0
     has_content = True
@@ -36,9 +39,6 @@ class PlantUML(Directive):
     }
 
     def run(self):
-        source = self.state_machine.input_lines.source(self.lineno - self.state_machine.input_offset - 1)
-        source_dir = os.path.dirname(os.path.abspath(source))
-        source_dir = utils.relative_path(None, source_dir)
 
         path = os.path.abspath(os.path.join('content', 'uml'))
 
@@ -46,7 +46,6 @@ class PlantUML(Directive):
             os.makedirs(path)
 
         nodes = []
-
         body = '\n'.join(self.content)
         tf = tempfile.NamedTemporaryFile(delete=True)
         tf.write('@startuml\n'.encode('utf-8'))
@@ -77,7 +76,7 @@ class PlantUML(Directive):
             out, err = p.communicate()
         except Exception as exc:
             error = self.state_machine.reporter.error(
-                'Failed to run plantuml: %s' % (exc, ),
+                'Failed to run plantuml: %s' % exc,
                 literal_block(self.block_text, self.block_text),
                 line=self.lineno)
             nodes.append(error)
@@ -104,7 +103,6 @@ class PlantUML(Directive):
                     literal_block(self.block_text, self.block_text),
                     line=self.lineno)
                 nodes.append(error)
-
         return nodes
 
 
@@ -122,9 +120,6 @@ class Ditaa(Directive):
     }
 
     def run(self):
-        source = self.state_machine.input_lines.source(self.lineno - self.state_machine.input_offset - 1)
-        source_dir = os.path.dirname(os.path.abspath(source))
-        source_dir = utils.relative_path(None, source_dir)
 
         path = os.path.abspath(os.path.join('content', 'uml'))
 
@@ -185,14 +180,35 @@ class Ditaa(Directive):
 
 
 def custom_url(generator, metadata):
+    """ Saves globally the value of SITEURL configuration parameter """
     global global_siteurl
     global_siteurl = generator.settings['SITEURL']
     if "/" in global_siteurl[2:]:  # trim "//" from url, and return to origin SITEURL for subsites
         global_siteurl = global_siteurl[:global_siteurl.rindex("/")]
 
 
+def pelican_init(pelicanobj):
+    """ Prepare configurations for the MD plugin """
+    try:
+        import markdown
+        from plantuml_md import PlantUMLMarkdownExtension
+    except:
+        # Markdown not available
+        logger.debug("[plantuml] Markdown support not available")
+        return
+
+    # Register the Markdown plugin
+    config = { 'siteurl': pelicanobj.settings['SITEURL'] }
+
+    try:
+        pelicanobj.settings['MD_EXTENSIONS'].append(PlantUMLMarkdownExtension(config))
+    except:
+        logger.error("[plantuml] Unable to configure plantuml markdown extension")
+
+
 def register():
     """Plugin registration."""
+    signals.initialized.connect(pelican_init)
     signals.article_generator_context.connect(custom_url)
-    directives.register_directive('uml', PlantUML)
     directives.register_directive('ditaa', Ditaa)
+    directives.register_directive('uml', PlantUML_rst)
