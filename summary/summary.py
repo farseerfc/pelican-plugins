@@ -1,12 +1,12 @@
 """
 Summary
 -------
+
 This plugin allows easy, variable length summaries directly embedded into the
 body of your articles.
 """
 
-import types
-
+from __future__ import unicode_literals
 from pelican import signals
 from pelican.generators import ArticlesGenerator, StaticGenerator, PagesGenerator
 import re
@@ -25,7 +25,8 @@ def initialized(pelican):
                                     '<!-- PELICAN_END_SUMMARY -->')
         pelican.settings.setdefault('SUMMARY_USE_FIRST_PARAGRAPH', False)
 
-def content_object_init(instance):
+def extract_summary(instance):
+    # if summary is already specified, use it
     # if there is no content, there's nothing to do
     if hasattr(instance, '_summary'):
         instance.has_summary = True
@@ -96,5 +97,9 @@ def run_plugin(generators):
 
 def register():
     signals.initialized.connect(initialized)
-    signals.content_object_init.connect(content_object_init)
-
+    try:
+        signals.all_generators_finalized.connect(run_plugin)
+    except AttributeError:
+        # NOTE: This results in #314 so shouldn't really be relied on
+        # https://github.com/getpelican/pelican-plugins/issues/314
+        signals.content_object_init.connect(extract_summary)
