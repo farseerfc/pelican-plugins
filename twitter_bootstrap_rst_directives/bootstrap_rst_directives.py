@@ -30,9 +30,9 @@ class CleanHTMLTranslator(PelicanHTMLTranslator):
 
     """
         A custom HTML translator based on the Pelican HTML translator.
-        Used to clean up some components html classes that could conflict 
+        Used to clean up some components html classes that could conflict
         with the bootstrap CSS classes.
-        Also defines new tags that are not handleed by the current implementation of 
+        Also defines new tags that are not handleed by the current implementation of
         docutils.
 
         The most obvious example is the Container component
@@ -232,7 +232,7 @@ def html_role(name, rawtext, text, lineno, inliner,
 def glyph_role(name, rawtext, text, lineno, inliner,
                options={}, content=[]):
     """
-        This function defines a glyph inline role that show a glyph icon from the 
+        This function defines a glyph inline role that show a glyph icon from the
         twitter bootstrap framework
 
         *Usage:*
@@ -279,7 +279,7 @@ class Label(rst.Directive):
 
     '''
         generic Label directive class definition.
-        This class define a directive that shows 
+        This class define a directive that shows
         bootstrap Labels around its content
 
         *usage:*
@@ -349,19 +349,19 @@ class Panel(rst.Directive):
 
     """
         generic Panel directive class definition.
-        This class define a directive that shows 
+        This class define a directive that shows
         bootstrap Labels around its content
 
         *usage:*
 
-            .. panel-<panel-type>:: 
+            .. panel-<panel-type>::
                 :title: <title>
 
                 <Panel content>
 
         *example:*
 
-            .. panel-default:: 
+            .. panel-default::
                 :title: panel title
 
                 This is a default panel content
@@ -439,7 +439,7 @@ class Alert(rst.Directive):
 
     """
         generic Alert directive class definition.
-        This class define a directive that shows 
+        This class define a directive that shows
         bootstrap Labels around its content
 
         *usage:*
@@ -525,12 +525,12 @@ class Friend(rst.Directive):
             gravatar_email = self.options['gravatar'].strip().encode('utf-8')
             logo_url = 'https://www.gravatar.com/avatar/' + md5(gravatar_email).hexdigest()
 
-        image_element = nodes.image(logo_url, alt=self.options['nick'], width="80px", **self.options)
+        image_element = nodes.image(logo_url, alt=self.options['nick'], width="120px", **self.options)
         image_element['uri'] = logo_url
-        image_element["classes"] = ['media-object']
+        # image_element["classes"] = ['media-object']
 
         image_container = nodes.container()
-        image_container["classes"] += ['media-left']
+        image_container["classes"] += ['friend-head']
         image_container.append(image_element)
 
         title_text = self.options['nick']
@@ -549,7 +549,7 @@ class Friend(rst.Directive):
                                 body_element)
         body_container.append(heading_element)
         body_container.append(body_element)
-        body_container['classes'] += ['media-body']
+        body_container['classes'] += ['friend-body']
 
         container_element.append(image_container)
         container_element.append(body_container)
@@ -559,7 +559,7 @@ class Media(rst.Directive):
 
     '''
         generic Media directive class definition.
-        This class define a directive that shows 
+        This class define a directive that shows
         bootstrap media image with text according
         to the media component on bootstrap
 
