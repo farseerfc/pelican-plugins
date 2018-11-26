@@ -540,7 +540,7 @@ class Friend(rst.Directive):
         title = nodes.paragraph(title_text, '', *title_nodes)
 
         heading_element.append(title)
-        heading_element['classes'] += ['media-heading']
+        heading_element['classes'] += ['media-heading', 'h5']
 
         # get body element
         body_container = nodes.container()
