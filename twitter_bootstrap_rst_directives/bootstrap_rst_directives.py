@@ -181,6 +181,55 @@ def fref_role(name, rawtext, text, lineno, inliner,
     return [new_element], []
 
 
+def pkg_role(name, rawtext, text, lineno, inliner,
+              options={}, content=[]):
+    """
+        *usage:*
+            :pkg:`aur/$aurpkgname` or :pkg:`$repo/$arch/pkgname` 
+
+    """
+    s = tuple(text.split("/"))
+    uri = ""
+    pkgname = ""
+    if len(s) == 1:
+        uri="https://www.archlinux.org/packages/?sort=&q="+s[0]
+        pkgname = s[0]
+    elif len(s) == 2:
+        if s[0] == 'aur':
+            uri = "https://aur.archlinux.org/packages/" + s[1] + "/"
+            pkgname = s[1]
+        else:
+            uri="https://www.archlinux.org/packages/" + s[0] +"/x86_64/" + s[1] + "/"
+            pkgname = s[1]
+    else:
+        uri = "https://www.archlinux.org/packages/" + s[0] +"/" + s[1] + "/" + s[2] + "/"
+        pkgname = s[2]
+
+
+    new_element = nodes.reference(rawtext, pkgname, refuri=uri)
+    return [new_element], []
+
+
+def archwiki_role(name, rawtext, text, lineno, inliner,
+              options={}, content=[]):
+    """
+        *usage:*
+            :archwiki:`Wiki Name` or :archwiki:`Wiki Name | Text name`
+
+    """
+    rs = tuple(text.split("|"))
+    if len(rs) == 2:
+        content = rs[0]
+        uri = "https://wiki.archlinux.org/index.php/" + rs[0].replace(' ', '_')
+    else:
+        content = text
+        uri = "https://wiki.archlinux.org/index.php/" + text.replace(' ', '_')
+
+    new_element = nodes.reference(rawtext, content, refuri=uri)
+    return [new_element], []
+
+
+
 def irc_role(name, rawtext, text, lineno, inliner,
               options={}, content=[]):
     """
@@ -700,6 +749,8 @@ def register_roles():
     rst.roles.register_local_role('twi', twi_role)
     rst.roles.register_local_role('fref', fref_role)
     rst.roles.register_local_role('irc', irc_role)
+    rst.roles.register_local_role('pkg', pkg_role)
+    rst.roles.register_local_role('archwiki', archwiki_role)
 
 
 def add_reader(readers):
