@@ -132,6 +132,8 @@ def code_role(name, rawtext, text, lineno, inliner,
 
         This code is not highlighted
     """
+    rawtext = rawtext.replace("/", "/\u200B") # adding breakable zero width space
+    text = text.replace("/", "/\u200B") # adding breakable zero width space
     new_element = nodes.literal(rawtext, text)
     new_element.set_class('code')
 
