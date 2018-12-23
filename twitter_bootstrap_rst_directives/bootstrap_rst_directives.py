@@ -13,6 +13,7 @@ the twitter bootstrap framework.
 
 from __future__ import unicode_literals
 
+import sys
 
 from uuid import uuid1
 
@@ -185,7 +186,7 @@ def pkg_role(name, rawtext, text, lineno, inliner,
               options={}, content=[]):
     """
         *usage:*
-            :pkg:`aur/$aurpkgname` or :pkg:`$repo/$arch/pkgname` 
+            :pkg:`aur/$aurpkgname` or :pkg:`$repo/$arch/pkgname`
 
     """
     s = tuple(text.split("/"))
@@ -323,6 +324,55 @@ glyph_role.options = {
 }
 glyph_role.content = False
 
+class TranslateParagraph(rst.Directive):
+    has_content = True
+
+    def create_rows(self, content):
+        # return content
+        result = []
+        current_type = None
+        current_row = []
+        for i in content:
+            # print(type(i), file=sys.stderr)
+            if type(i) == nodes.block_quote:
+                current_row.append(i.children[0])
+            else:
+                result.append(current_row)
+                current_row = [i]
+        result.append(current_row)
+        return result
+
+    def create_table_row(self, row_cells):
+        row = nodes.row()
+        for cell in row_cells:
+            entry = nodes.entry()
+            row += entry
+            entry += cell
+        return row
+
+    def run(self):
+
+        p = nodes.paragraph(text=self.content)
+        self.state.nested_parse(self.content, self.content_offset, p)
+
+        content = self.create_rows(p.children[1:])
+        table = nodes.table(border=0)
+
+        tgroup = nodes.tgroup(cols=len(content))
+        table += tgroup
+        for i in range(2):
+            tgroup += nodes.colspec(colwidth=1)
+
+        # thead = nodes.thead()
+        # tgroup += thead
+        # thead += self.create_table_row(header)
+
+        tbody = nodes.tbody()
+        tgroup += tbody
+        for data_row in content:
+            tbody += self.create_table_row(data_row)
+
+        return [table]
 
 class Label(rst.Directive):
 
@@ -737,6 +787,7 @@ def register_directives():
 
     rst.directives.register_directive('media', Media)
     rst.directives.register_directive('friend', Friend)
+    rst.directives.register_directive('translate-paragraph', TranslateParagraph)
 
 
 def register_roles():

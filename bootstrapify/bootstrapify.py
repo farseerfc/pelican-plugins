@@ -11,7 +11,10 @@ def replace(searchterm, soup, attributes):
     for item in soup.findAll(searchterm):
         item.attrs['class'] = list(set(item.attrs.get('class', []) + attributes))
 
-def replace_tables(soup, attributes=['table',' table-striped', 'table-hover']):
+# def replace_tables(soup, attributes=['table',' table-striped', 'table-hover']):
+#     replace('table', soup, attributes)
+
+def replace_tables(soup, attributes=['table']):
     replace('table', soup, attributes)
 
 def replace_images(soup, attributes=['img-responsive']):
