@@ -16,6 +16,8 @@ def replace(searchterm, soup, attributes):
 
 def replace_tables(soup, attributes=['table']):
     replace('table', soup, attributes)
+    for item in soup.findAll('table'):
+        item.attrs['border'] = 0
 
 def replace_images(soup, attributes=['img-responsive']):
     replace('img', soup, attributes)

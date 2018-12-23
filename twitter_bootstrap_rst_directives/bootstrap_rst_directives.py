@@ -13,7 +13,7 @@ the twitter bootstrap framework.
 
 from __future__ import unicode_literals
 
-import sys
+import sys, re
 
 from uuid import uuid1
 
@@ -358,7 +358,68 @@ class TranslateParagraph(rst.Directive):
         self.state.nested_parse(self.content, self.content_offset, p)
 
         content = self.create_rows(p.children[1:])
-        table = nodes.table(border=0)
+        table = nodes.table(border=0, frame='void')
+
+        tgroup = nodes.tgroup(cols=len(content))
+        table += tgroup
+        for i in range(2):
+            tgroup += nodes.colspec(colwidth=1)
+
+        # thead = nodes.thead()
+        # tgroup += thead
+        # thead += self.create_table_row(header)
+
+        tbody = nodes.tbody()
+        tgroup += tbody
+        for data_row in content:
+            tbody += self.create_table_row(data_row)
+
+        return [table]
+
+class TranslateLyrics(rst.Directive):
+    has_content = True
+
+    def create_rows(self, content):
+        # return content
+        result = []
+        current_type = None
+        for i in content:
+            # print('---------', file=sys.stderr)
+            # print('ibefore:'+ str(i), file=sys.stderr)
+            if type(i) == nodes.line:
+                if len(i.children) > 0:
+                    i = str(i.children[0])
+                else:
+                    i = ""
+            # print('iafter:'+ str(i), file=sys.stderr)
+            # r = []
+            # for x in re.split("[ 　]+", i):
+            #     n = nodes.line(text=x)
+            #     r.append(n)
+            # if len(r)<2:
+            #     r = [nodes.line(), nodes.line()]
+            # print('r:'+str(r), file=sys.stderr)
+            # result.append(r)
+            n = nodes.line(text=i)
+            # self.state.nested_parse(n, self.content_offset, n)
+            result.append([n,])
+        return result
+
+    def create_table_row(self, row_cells):
+        row = nodes.row()
+        for cell in row_cells:
+            entry = nodes.entry()
+            row += entry
+            entry += cell
+        return row
+
+    def run(self):
+
+        p = nodes.line_block(text=self.content)
+        self.state.nested_parse(self.content, self.content_offset, p)
+
+        content = self.create_rows(p.children[0].children)
+        table = nodes.table(border=0, frame='void')
 
         tgroup = nodes.tgroup(cols=len(content))
         table += tgroup
@@ -790,6 +851,7 @@ def register_directives():
     rst.directives.register_directive('media', Media)
     rst.directives.register_directive('friend', Friend)
     rst.directives.register_directive('translate-paragraph', TranslateParagraph)
+    rst.directives.register_directive('translate-lyrics', TranslateLyrics)
 
 
 def register_roles():
