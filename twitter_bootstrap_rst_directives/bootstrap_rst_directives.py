@@ -172,6 +172,20 @@ def twi_role(name, rawtext, text, lineno, inliner,
     new_element = nodes.reference(rawtext, "@"+text, refuri="//twitter.com/"+text)
     return [new_element], []
 
+def pixiv_role(name, rawtext, text, lineno, inliner,
+              options={}, content=[]):
+    """
+        This function creates an inline code block as defined in the twitter bootstrap documentation
+        overrides the default behaviour of the code role
+
+        *usage:*
+            :pixiv:`illust_id|text`
+
+    """
+    rs = tuple(text.split("|"))
+    new_element = nodes.reference(rawtext, "%s (Pixiv %s)" % (rs[1], rs[0]), refuri="https://www.pixiv.net/member_illust.php?mode=medium&illust_id="+rs[0])
+    return [new_element], []
+
 
 def fref_role(name, rawtext, text, lineno, inliner,
               options={}, content=[]):
@@ -862,6 +876,7 @@ def register_roles():
     rst.roles.register_local_role('del', del_role)
     rst.roles.register_local_role('html', html_role)
     rst.roles.register_local_role('twi', twi_role)
+    rst.roles.register_local_role('pixiv', pixiv_role)
     rst.roles.register_local_role('fref', fref_role)
     rst.roles.register_local_role('irc', irc_role)
     rst.roles.register_local_role('pkg', pkg_role)
