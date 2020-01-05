@@ -10,11 +10,13 @@ from __future__ import unicode_literals
 import sys
 import os
 import tempfile
+import io
 
 from subprocess import Popen,PIPE
 from zlib import adler32
 
-from docutils.nodes import image, literal_block
+from docutils import utils
+from docutils.nodes import paragraph, raw, image, literal_block
 from docutils.parsers.rst import Directive, directives
 from pelican import signals, logger
 
@@ -178,6 +180,52 @@ class Ditaa(Directive):
 
         return nodes
 
+def make_graphviz(layout):
+    class Graphviz(Directive):
+        required_arguments = 0
+        optional_arguments = 0
+        has_content = True
+
+        global global_siteurl
+
+        option_spec = {
+            'class' : directives.class_option,
+            'alt'   : directives.unchanged,
+            'format': directives.unchanged,
+        }
+
+        def run(self):
+            nodes = []
+
+            body = '\n'.join(self.content)
+
+            alt = self.options.get('alt', 'Graphviz diagram')
+            classes = self.options.pop('class', ['graphviz'])
+            cmdline = [layout, '-Tsvg']
+
+            try:
+                p = Popen(cmdline, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+                out, err = p.communicate(input=body.encode('utf8'))
+            except Exception as exc:
+                error = self.state_machine.reporter.error(
+                    'Failed to run %s: %s' % (layout, exc),
+                    literal_block(self.block_text, self.block_text),
+                    line=self.lineno)
+                nodes.append(error)
+            else:
+                if p.returncode == 0:
+                    svg = out.decode('utf-8')
+                    imgnode = raw(svg, svg, format="html")
+                    nodes.append(imgnode)
+                else:
+                    error = self.state_machine.reporter.error(
+                        'Error in "%s" directive: %s' % (self.name, err),
+                        literal_block(self.block_text, self.block_text),
+                        line=self.lineno)
+                    nodes.append(error)
+
+            return nodes
+    return Graphviz
 
 def custom_url(generator, metadata):
     """ Saves globally the value of SITEURL configuration parameter """
@@ -212,3 +260,6 @@ def register():
     signals.article_generator_context.connect(custom_url)
     directives.register_directive('ditaa', Ditaa)
     directives.register_directive('uml', PlantUML_rst)
+    graphviz_filters = 'dot neato twopi circo fdp sfdp patchwork osage'.split(' ')
+    for f in graphviz_filters:
+        directives.register_directive(f, make_graphviz(f))

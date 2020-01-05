@@ -22,6 +22,9 @@ def replace_tables(soup, attributes=['table']):
 def replace_images(soup, attributes=['img-responsive']):
     replace('img', soup, attributes)
 
+def replace_svg(soup, attributes=['svg-responsive']):
+    replace('svg', soup, attributes)
+
 def replace_embed(soup, attributes=['embed-responsive-item']):
     replace('embed', soup, attributes)
     replace('iframe', soup, attributes)
@@ -37,6 +40,7 @@ def bootstrapify(content):
     soup = BeautifulSoup(content._content, 'html.parser')
     replace_tables(soup)
     replace_images(soup)
+    replace_svg(soup)
     replace_embed(soup)
 
     content._content = soup.decode()
