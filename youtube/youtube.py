@@ -73,7 +73,7 @@ class YouTube(Directive):
 
         url = 'https://www.youtube.com/embed/{}'.format(videoID)
         div_block = '<div class="youtube embed-responsive embed-responsive-16by9" align="{}">'.format(align)
-        embed_block = '<iframe src="{}" frameborder="0"></iframe>'.format(url)
+        embed_block = '<iframe src="{}" frameborder="0" allow="fullscreen"></iframe>'.format(url)
 
         return [
             nodes.raw('', div_block, format='html'),
