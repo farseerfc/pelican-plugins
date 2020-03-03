@@ -158,6 +158,8 @@ class Tikz(Directive):
         try:
             p = Popen(cmdline, stdout=PIPE, stderr=PIPE)
             out, err = p.communicate()
+            logger.debug("tikz2svg out: "+ out.decode('utf-8'))
+            logger.debug("tikz2svg err: "+ err.decode('utf-8'))
         except Exception as exc:
             error = self.state_machine.reporter.error(
                 'Failed to run tikz: %s' % exc,
