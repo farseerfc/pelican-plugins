@@ -120,6 +120,7 @@ class Tikz(Directive):
         'class': directives.class_option,
         'alt': directives.unchanged,
         'format': directives.unchanged,
+        'libs': directives.unchanged,
     }
 
     def run(self):
@@ -131,22 +132,19 @@ class Tikz(Directive):
 
         nodes = []
         body = '\n'.join(self.content)
+        if self.options.get('libs', False):
+            libs = '\n'.join(('\\usetikzlibrary{%s}' % x) for x in self.options.get('libs', False).split(','))
+        else:
+            libs = ''
         tf = tempfile.NamedTemporaryFile(delete=True)
-        tf.write('\\documentclass{standalone}\n\\usepackage{tikz}\n\\begin{document}\n'.encode('utf-8'))
+        tf.write(('\\documentclass{standalone}\n\\usepackage{tikz}\n%s\n\\begin{document}\\begin{tikzpicture}\n' % libs).encode('utf-8'))
         tf.write(body.encode('utf8'))
-        tf.write('\n\\end{document}'.encode('utf-8'))
+        tf.write('\n\\end{tikzpicture}\\end{document}'.encode('utf-8'))
         tf.flush()
 
         imgformat = self.options.get('format', 'svg')
+        imgext = ".svg"
 
-        if imgformat == 'png':
-            imgext = ".png"
-            outopt = "-tpng"
-        elif imgformat == 'svg':
-            imgext = ".svg"
-            outopt = "-tsvg"
-        else:
-            logger.error("Bad tikz image format: " + imgformat)
 
         # make a name
         name = tf.name + imgext
