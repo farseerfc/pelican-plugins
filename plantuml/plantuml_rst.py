@@ -136,8 +136,8 @@ class Tikz(Directive):
             libs = '\n'.join(('\\usetikzlibrary{%s}' % x) for x in self.options.get('libs', False).split(','))
         else:
             libs = ''
-        tf = tempfile.NamedTemporaryFile(delete=True)
-        tf.write(('\\documentclass{standalone}\n\\usepackage{tikz}\n%s\n\\begin{document}\\begin{tikzpicture}\n' % libs).encode('utf-8'))
+        tf = tempfile.NamedTemporaryFile(delete=False)
+        tf.write(('\\documentclass{standalone}\n\\usepackage{xeCJK,fontspec,xunicode}\\usepackage{tikz}\n%s\n\\begin{document}\\begin{tikzpicture}\n' % libs).encode('utf-8'))
         tf.write(body.encode('utf8'))
         tf.write('\n\\end{tikzpicture}\\end{document}'.encode('utf-8'))
         tf.flush()
