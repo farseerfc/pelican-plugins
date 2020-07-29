@@ -137,7 +137,7 @@ class Tikz(Directive):
         else:
             libs = ''
         tf = tempfile.NamedTemporaryFile(delete=False)
-        tf.write(('\\documentclass{standalone}\n\\usepackage{xeCJK,fontspec,xunicode}\\usepackage{tikz}\n%s\n\\begin{document}\\begin{tikzpicture}\n' % libs).encode('utf-8'))
+        tf.write(('\\documentclass{standalone}\n\\usepackage{xeCJK,fontspec,xunicode}\\usepackage{tikz}\setCJKmainfont{Noto Sans CJK TC}\n%s\n\\begin{document}\\begin{tikzpicture}\n' % libs).encode('utf-8'))
         tf.write(body.encode('utf8'))
         tf.write('\n\\end{tikzpicture}\\end{document}'.encode('utf-8'))
         tf.flush()
