@@ -96,7 +96,7 @@ sub tikz2svg{
 	close TEX if $tex ne "-";
 
 	$svg = "/dev/stdout" if $svg eq "-";
-	print `inkscape --without-gui texput.pdf -l $svg`;
+	print `pdftocairo -svg texput.pdf $svg`;
 
 	unlink glob "texput.*";
 }

@@ -373,6 +373,10 @@ class TranslateParagraph(rst.Directive):
 
         content = self.create_rows(p.children[1:])
         table = nodes.table(border=0, frame='void')
+        classes = self.options.setdefault('class', [])
+        for custom_class in classes:
+            table.set_class(custom_class)
+        table['classes'] += ['translate-paragraph']
 
         tgroup = nodes.tgroup(cols=len(content))
         table += tgroup
