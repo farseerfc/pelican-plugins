@@ -16,6 +16,7 @@ from __future__ import unicode_literals
 import sys, re
 
 from uuid import uuid1
+from zlib import adler32
 
 from html import escape
 from docutils import nodes, utils
@@ -455,6 +456,74 @@ class TranslateLyrics(rst.Directive):
 
         return [table]
 
+
+
+class TranslateCollapse(rst.Directive):
+
+    has_content = True
+    option_spec = {
+        'title': rst.directives.unchanged,
+    }
+    custom_class = ''
+
+    def run(self):
+        # get the label title
+        title_text = self.options.get('title', '')
+        # get the label content
+        text = '\n'.join(self.content)
+        collapse_id = "%08x" % (adler32(text.encode('utf8')) & 0xffffffff)
+        # Create the panel headings
+        #btn_element = nodes.reference(title_text, title_text, refuri="#"+collapse_id)
+        title_tag = f'''<a class="translate-collapse-btn" data-toggle="collapse" href="#{collapse_id}" role="button" aria-expanded="false" aria-controls="{collapse_id}">
+                        <span class="badge badge-pill badge-light"><i class="fa fa-language"></i> {title_text}</span></a>'''
+        btn_element = nodes.raw(title_text, utils.unescape(title_tag, 1), format="html")
+        body_element = nodes.block_quote(text)
+        body_element['classes'] += ['collapse']
+        body_element['ids'] = [collapse_id]
+        self.state.nested_parse(self.content, self.content_offset,
+                                body_element)
+
+        return [btn_element, body_element]
+
+
+class TranslateCollapseParagraph(rst.Directive):
+    has_content = True
+    option_spec = {
+        'title': rst.directives.unchanged,
+    }
+
+    def create_collapse(self, title_text, text):
+        # Create the panel element
+        collapse_id = "%08x" % (adler32(str(text).encode('utf8')) & 0xffffffff)
+        title_tag = f'''<a class="translate-collapse-btn" data-toggle="collapse" href="#{collapse_id}" role="button" aria-expanded="false" aria-controls="{collapse_id}">
+                        <span class="badge badge-pill badge-light"><i class="fa fa-language"></i> {title_text}</span></a>'''
+        btn_element = nodes.raw(title_text, utils.unescape(title_tag, 1), format="html")
+        body_element = nodes.container()
+        body_element['classes'] += ['collapse']
+        body_element['ids'] = [collapse_id]
+        body_element.append(text)
+
+        return [btn_element, body_element]
+
+    def create_rows(self, title_text, content):
+        result = []
+        current_row = []
+        for i in content:
+            if type(i) == nodes.block_quote:
+                result += self.create_collapse(title_text, i)
+                result += current_row
+                current_row = []
+            else:
+                current_row.append(i)
+        result += current_row
+        return result
+
+    def run(self):
+        title_text = self.options.get('title', '')
+        p = nodes.container(self.content)
+        self.state.nested_parse(self.content, self.content_offset, p)
+        return self.create_rows(title_text, p.children)
+
 class Label(rst.Directive):
 
     '''
@@ -870,6 +939,8 @@ def register_directives():
     rst.directives.register_directive('friend', Friend)
     rst.directives.register_directive('translate-paragraph', TranslateParagraph)
     rst.directives.register_directive('translate-lyrics', TranslateLyrics)
+    rst.directives.register_directive('translate-collapse', TranslateCollapse)
+    rst.directives.register_directive('translate-collapse-paragraph', TranslateCollapseParagraph)
 
 
 def register_roles():
